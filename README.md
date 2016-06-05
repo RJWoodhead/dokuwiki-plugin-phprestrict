@@ -1,7 +1,7 @@
 # phprestrict
 
 base   phprestrict
-author Robert Woodhead
+author Robert J. Woodhead
 email  trebor@animeigo.com
 date   2016-05-30
 name   phprestrict plugin
