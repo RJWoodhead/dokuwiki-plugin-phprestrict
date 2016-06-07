@@ -4,6 +4,10 @@
  *
  * @license GPL 2 http://www.gnu.org/licenses/gpl-2.0.html
  * @author	Robert Woodhead <trebor@animeigo.com>
+ *
+ * Version 1.0 - Initial release
+ *
+ * Version 1.1 - Added disable of revision history on PHP pages.
  */
 
 if(!defined('DOKU_INC')) die(); // must be run within Dokuwiki
@@ -16,10 +20,11 @@ class action_plugin_phprestrict_action extends DokuWiki_Action_Plugin {
 	 * @param Doku_Event_Handler $controller DokuWiki's event controller object
 	 * @return void
 	 */
+
 	public function register(Doku_Event_Handler $controller) {
 		
-		// error_log("register()");
-		
+		// Future feature: To kill PHP in non-enabled pages, will need to hook IO_WIKIPAGE_READ
+				
 		$controller->register_hook('DOKUWIKI_STARTED', 'BEFORE', $this, 'handle_action');
 		
 	}
@@ -47,15 +52,12 @@ class action_plugin_phprestrict_action extends DokuWiki_Action_Plugin {
 		$id = $INFO['id'];
 		
 		foreach ($paths as $path) {
-		
-			$last = substr($path,-1);
-			
+					
 			switch (substr($path,-1)) {
 			
-				case false:				// empty string
+				case false:		// empty string
 				
-					$phpok = false;
-					break;
+					continue;	// try next path
 					
 				case ':':
 				
@@ -78,16 +80,12 @@ class action_plugin_phprestrict_action extends DokuWiki_Action_Plugin {
 			
 				$conf['phpok'] = 1;
 				
-				// source display can be disabled on PHP pages
+				// source display/export/revisions can be disabled on potential PHP pages
 				
 				if ($this->getConf('hide') === 1) {
-					if (strpos($conf['disableactions'],'source,export_raw') === false) {
-						if ($conf['disableactions'] !== '') {
-							$conf['disableactions'] .= ',';
-						}
-						
-						$conf['disableactions'] .= 'source,export_raw';
-					}
+					if (strpos($conf['disableactions'],'source') === false) $conf['disableactions'] .= ',source';
+					if (strpos($conf['disableactions'],'export_raw') === false) $conf['disableactions'] .= ',export_raw';
+					if (strpos($conf['disableactions'],'revisions') === false) $conf['disableactions'] .= ',revisions';
 				}
 				
 				return;
@@ -97,7 +95,7 @@ class action_plugin_phprestrict_action extends DokuWiki_Action_Plugin {
 		}
 		
 		// fall through to default of no php!
-		
+
 	}
 
 }

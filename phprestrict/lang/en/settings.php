@@ -7,4 +7,4 @@
 
 
 $lang['paths'] = 'PHP-enabled pages (comma / newline delimited):<br /><br />Examples:<br /><br />"namespace:", "namespace:page", "namespace:prefix*"';
-$lang['hide'] = "Disable view/download source on PHP-enabled pages?";
+$lang['hide'] = "Disable view/export/revisions on PHP-enabled pages?";
