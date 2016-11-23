@@ -22,11 +22,11 @@ class action_plugin_phprestrict_action extends DokuWiki_Action_Plugin {
 	 */
 
 	public function register(Doku_Event_Handler $controller) {
-		
+
 		// Future feature: To kill PHP in non-enabled pages, will need to hook IO_WIKIPAGE_READ
-				
+
 		$controller->register_hook('DOKUWIKI_STARTED', 'BEFORE', $this, 'handle_action');
-		
+
 	}
 
 	/**
@@ -34,66 +34,74 @@ class action_plugin_phprestrict_action extends DokuWiki_Action_Plugin {
 	 */
 
 	public function handle_action(Doku_Event &$event, $param) {
-	
+
 		global $conf;
 		global $INFO;
-		
+		global $REV;
+
 		// default to php being disabled on all pages
 
 		$conf['phpok'] = 0;
-		
+
+		// php is NEVER OK on revision pages
+
+		if ($REV) {
+			return;
+
+		}
+
 		// check for path match and enable PHP if found
 
 		$paths = explode(',',
 						 str_replace(array("\r\n","\r","\n"),',',
 									 $this->getConf('paths')
 						));
-		
+
 		$id = $INFO['id'];
-		
+
 		foreach ($paths as $path) {
-					
+
 			switch (substr($path,-1)) {
-			
+
 				case false:		// empty string
-				
+
 					continue;	// try next path
-					
+
 				case ':':
-				
+
 					$phpok = (strpos($id,$path) === 0);
 					break;
-					
+
 				case '*':
-				
+
 					$phpok = (strpos($id,substr($path,0,-1)) === 0);
 					break;
-					
+
 				default:
-				
+
 					$phpok = ($id === $path);
 					break;
-					
+
 			}
-				
+
 			if ($phpok) {
-			
+
 				$conf['phpok'] = 1;
-				
+
 				// source display/export/revisions can be disabled on potential PHP pages
-				
+
 				if ($this->getConf('hide') === 1) {
 					if (strpos($conf['disableactions'],'source') === false) $conf['disableactions'] .= ',source';
 					if (strpos($conf['disableactions'],'export_raw') === false) $conf['disableactions'] .= ',export_raw';
 					if (strpos($conf['disableactions'],'revisions') === false) $conf['disableactions'] .= ',revisions';
 				}
-				
+
 				return;
-				
-			}		
-		   
+
+			}
+
 		}
-		
+
 		// fall through to default of no php!
 
 	}
