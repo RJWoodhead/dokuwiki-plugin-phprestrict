@@ -65,7 +65,7 @@ class action_plugin_phprestrict_action extends DokuWiki_Action_Plugin {
 
 				case false:		// empty string
 
-					continue;	// try next path
+					continue 2;	// try next path
 
 				case ':':
 
